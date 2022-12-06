@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "*.py": "python",
+        "*.v": "verilog",
+        "string.h": "c"
+    },
+    "docwriter.progress.trackFunctions": false,
+    "docwriter.style": "Auto-detect"
+}
