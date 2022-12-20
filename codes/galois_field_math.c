@@ -175,7 +175,7 @@ int main()
     //         print_function_galois(i, 0x11);
     //     }
     // }
-    print_function_galois(0x78, 0xb6);
+    print_function_galois(0xff, 0x1c);
     // check_value(13712);
     // printf("%d", inverseFind(6));
     // checck both print_function_galois and multiply_ints_as_polynomials
