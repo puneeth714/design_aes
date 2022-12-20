@@ -29,29 +29,14 @@ input  [2*(WIDTH-1):0] cin;
 output  reg [7:0] cout;
 reg [2*(WIDTH-1):0] keep_on;
 reg [3:0]place;
-reg done=0;
+reg done=1;
+reg a=0;
 always @(cin)
 begin:find_place
-    reg [3:0]i;
-    reg set;
-    set=0;
-    //when cin changes find the place and store in place
-    for(i=(2*(WIDTH-1));i>0;i=i-1)
-    begin:loop_for_place
-        //check if that bit is 1 or not
-        //$display((1<<i) & cin);
-        if(((1<<i) & cin)!=0 && set ==0 && done == 0)
-        begin:condition_place
-            //if so set it to place
-            if(i<8)
-            begin:if_done
-                done=1;
-            end
-            place=i;
-            keep_on=cin;
-            set=1;
-            //set i to 0 so it will not run again
-        end
+    if (done==1)
+    begin
+        keep_on=cin;
+        done=0;
     end
 end
 
@@ -86,7 +71,8 @@ begin:divison_do
     //$display("done1 %d",keep_on);
     if(done!=1)
     begin:divide
-        keep_on = (keep_on ^ (283 <<(place-8)));
+        //keep_on = (keep_on ^ (283 <<(place-8)));
+		  a=1;
     //$display("done %d",keep_on);
     end
     
@@ -98,15 +84,3 @@ begin
 end
 endmodule
 
-module test;
-reg  [14:0] cin;
-wire   [7:0] cout;
-galois_multiplication_modulous g1(cin,cout);
-initial begin
-    $monitor("input is %b output is %b",cin,cout);
-    // repeat (20)
-    //     #10 cin=$random % 15;
-    cin=15'b000101111110100;
-    #20;
-end
-endmodule
