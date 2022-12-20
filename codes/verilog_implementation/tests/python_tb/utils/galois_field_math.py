@@ -8,11 +8,7 @@
 
 
 def get_combination(x, value):
-    vals = []
-    for i in range(value+1):
-        if i <= x and value-i <= x:
-            vals.append([i, value-i])
-    return vals
+    return [[i, value-i] for i in range(value+1) if i <= x and value-i <= x]
 
 # fucction to find galosie multiplication of two numbers
 
@@ -29,28 +25,19 @@ def galois_multiplication(a, b):
     """
     a and b are two numbers"""
     string = ""
-    for i in range(14):
+    for i in range(15):
         # loop through the combinations
         combs = get_combination(7, i)
-        if len(combs) == 1:
-            if (a & (1 << combs[0][0])) and (b & (1 << combs[0][1])):
-                string += "x^"+str(i)+" + "
-        else:
-            present = False
-            for comb in combs:
-                # if the bit exists in more than one combination set False
-                if (a & (1 << comb[0])) and (b & (1 << comb[1])):
-                    if present:
-                        present = False
-                    else:
-                        present = True
-            if present:
-                string += "x^"+str(i)+" + "
-    return string[:-3]
+        present = False
+        for comb in combs:
+            if (a & (1 << comb[0])) and (b & (1 << comb[1])):
+                present = not present
+        string += "1" if present else "0"
+    return string[::-1]
 
 
 # print the result
-print(galois_multiplication(254, 254))
+print(galois_multiplication(255, 255))
 
 
 # convert above python code to c code

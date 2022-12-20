@@ -1,4 +1,7 @@
-printf("Enter the first number: ");
-    scanf("%d", &a);
-    printf("Enter the second number: ");
-    scanf("%d", &b);
+// here we use Itho's and tsuji's method
+    // int y = x;
+    // for (int i = 0; i < 253; i++)
+    // {
+    //     y = rijndael_multiplication(y, x);
+    //     // printf("y is %x \n", y);
+    // }

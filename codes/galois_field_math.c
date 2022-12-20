@@ -1,6 +1,12 @@
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+
+int findPlace(int value);
+void check_value(int value);
+void print_function_galois(unsigned char a, unsigned char b);
+int get_combination(int x, int value, int **vals);
+int inverseFind(int value);
 
 /**
  * Given a value and a maximum value, return all the possible combinations of the value that add up to
@@ -21,6 +27,7 @@ int get_combination(int x, int value, int **vals)
         {
             vals[j][0] = i;
             vals[j][1] = value - i;
+            // printf("vals[%d][0] = %d, vals[%d][1] = %d \n", j, vals[j][0], j, vals[j][1]);
             j++;
         }
     }
@@ -30,6 +37,8 @@ int get_combination(int x, int value, int **vals)
 /* This function is used to print the multiplication of two numbers in galois field. */
 void print_function_galois(unsigned char a, unsigned char b)
 {
+
+    int value = 0;
     for (int i = 0; i <= 14; i++)
     {
         // get the combination
@@ -51,24 +60,27 @@ void print_function_galois(unsigned char a, unsigned char b)
             // printf("if (%o & (1 << %d)) && (%d & (1 << %d))\n", a, first, b, second);
             if (a & (1 << first) && b & (1 << second))
             {
-                if (result == 1)
-                {
-                    result = 0;
-                    break;
-                }
-                result = 1;
+                // if (result == 1)
+                // {
+                //     result = 0;
+                //     break;
+                // }
+                // result = 1;
+                result ^= 1;
             }
         }
         if (result == 1)
         {
+            // set value at that position
+            value |= (1 << i);
             printf("x^%d", i); // made error of value-i by copilot insted of i
             if (i != 14)
             {
                 printf("+");
             }
         }
-        // free the memory
-        for (int i = 0; i < 15; i++)
+    // free the memory
+    for (int i = 0; i < 15; i++)
         {
             free(vals[i]);
         }
@@ -76,8 +88,70 @@ void print_function_galois(unsigned char a, unsigned char b)
     }
 
     printf("\n");
+    //print value
+    printf("value = %d\n", value);
+    check_value(value);
+    printf("%d\n", findPlace(value));
+
 }
 
+// check if the value is greater than 255 if not divide it by 100011011 in binary
+void check_value(int value)
+{
+    int vals, place;
+    vals = 283;
+    place = findPlace(value);
+    while (value > 255 && place >= 8)
+    {
+        // // divide by 100011011 in division don't substact but xor
+        value = (value ^ (283 << place - 8)); //& ((int)(pow(2,(place-8)-1)));
+        // printf("value = %d\n", value);
+        place = findPlace(value);
+    }
+
+    // printf("reminder = %d\n", value);
+    if (value == 1)
+    {
+        printf("Reminder is one\n");
+    }
+}
+int inverseFind(int value)
+{
+    //     where q = (q0, .., q3)is calculated as shown below with aA = a1 ⊕ a2 ⊕ a3 ⊕ a1a2 a3.q0 =
+    //         aA ⊕ a0 ⊕ a0 a2 ⊕ a1 a2 ⊕ a0 a1 a2
+    //             q1 =
+    //                 a0 a1 ⊕ a0a2 ⊕ a1a2 ⊕ a3 ⊕ a1a3 ⊕ a0a1 a3
+    //                     q2 =
+    //                         a0 a1 ⊕ a2 ⊕ a0 a2 ⊕ a3 ⊕ a0 a1 ⊕ a0 a2a3
+    //                             q3 =
+    //                                 aA ⊕ a0 a3 ⊕ a1 a3 ⊕ a2a3
+    int q0, q1, q2, q3;
+    int a0, a1, a2, a3;
+    a0 = value & 1;
+    a1 = (value >> 1) & 1;
+    a2 = (value >> 2) & 1;
+    a3 = (value >> 3) & 1;
+    int aA = a1 ^ a2 ^ a3 ^ a1 * a2 * a3;
+    q0 = aA ^ a0 ^ a0 * a2 ^ a1 * a2 ^ a0 * a1 * a2;
+    q1 = a0 * a1 ^ a0 * a2 ^ a1 * a2 ^ a3 ^ a1 * a3 ^ a0 * a1 * a3;
+    q2 = a0 * a1 ^ a2 ^ a0 * a2 ^ a3 ^ a0 * a1 ^ a0 * a2 * a3;
+    q3 = aA ^ a0 * a3 ^ a1 * a3 ^ a2 * a3;
+    printf("q0 = %d\n q1 = %d\n q2 = %d\n q3 = %d\n", q0, q1, q2, q3);
+    return (q0 | (q1 << 1) | (q2 << 2) | (q3 << 3));
+}
+int findPlace(int value)
+{
+    int place = 0;
+    // find the place of highest significant bit in value
+    for (int i = 0; i < 14; i++)
+    {
+        if (value & (1 << i))
+        {
+            place = i;
+        }
+    }
+    return place;
+}
 
 /**
  * > The function `print_function_galois` takes two unsigned char variables, `a` and `b`, and prints
@@ -94,14 +168,22 @@ int main()
     // printf("Enter the second number: ");
     // scanf("%x", &b);
     // printf("%d , %d\n", a, b);
-    for (int i = 0; i < 256; i++)
-    {
-        for (int j = 0; j < 256; j++)
-        {
-            printf("a = %x, b = %x, ", i, j);
-            print_function_galois(i, j);
-        }
-    }
+    // for (int i = 1; i < 256; i++)
+    // {
+    //     for (int j = 1; j < 256; j++)
+    //     {
+    //         // printf("a = %x, b = %x, ", i, 0x11);
+    //         print_function_galois(i, 0x11);
+    //     }
+    // }
+    print_function_galois(0xff, 0xff);
+    // check_value(13712);
+    // printf("%d", inverseFind(6));
+    // checck both print_function_galois and multiply_ints_as_polynomials
+    // printf("a = %x, b = %x, ", 0x78, 0xb6);
+    // print_function_galois(0x78, 0xb6);
+    // printf("a = %x, b = %x, ", 0x78, 0xb6);
+    // printf("result = %d\n", multiply_ints_as_polynomials(0x78, 0xb6));
     return 0;
 }
 
@@ -141,6 +223,7 @@ int main()
 5. malloc will allocate memory with the help of 1st paramenter in this code we are creating a array
 with 15 values of int* and int* point to array of two integers.
 6. first free the memory of the array of int* and then free the memory of the array of int.
+7. The number of repetetions are xor,but i have taken if result is 1 and if result if block is comming again break
 */
 
 // error code

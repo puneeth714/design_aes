@@ -1,0 +1,9 @@
+db
+__pycache__/
+increment*
+output*
+sim_build/
+*.xml
+*.out
+*.log
+simulation
