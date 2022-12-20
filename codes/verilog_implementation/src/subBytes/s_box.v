@@ -26,18 +26,19 @@ endmodule
 
 module galois_multiplication_modulous #(parameter WIDTH = 8) (cin,cout);
 input  [2*(WIDTH-1):0] cin;
-output   [7:0] cout;
+output   [3:0] cout;
 reg [3:0]place;
-reg [3:0]i;
-reg set=0;
 always @(cin)
-begin:find_place
+begin:loop
+    reg [3:0]i;
+    reg set;
+    set=0;
     //when cin changes find the place and store in place
     for(i=(2*(WIDTH-1));i>0;i=i-1)
-    begin:check_condition
+    begin
         //check if that bit is 1 or not
         if(((1<<i) & cin)!=0 && set ==0)
-        begin:found_msb
+        begin
             //if so set it to place
             place=i;
             set=1;
@@ -46,18 +47,16 @@ begin:find_place
         end
     end
 end
-
-always
-//assign cout=place;
+assign cout=place;
 endmodule
 
-// module test;
-// reg  [14:0] cin;
-// wire   [3:0] cout;
-// galois_multiplication_modulous g1(cin,cout);
-// initial begin
-//         $monitor("input is %b output is %d",cin,cout);
-//     repeat (200)
-//         #10 cin=$random % 15;
-// end
-// endmodule
+module test;
+reg  [14:0] cin;
+wire   [3:0] cout;
+galois_multiplication_modulous g1(cin,cout);
+initial begin
+        $monitor("input is %b output is %b",cin,cout);
+    repeat (20)
+        #10 cin=$random % 15;
+end
+endmodule

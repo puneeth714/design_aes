@@ -79,8 +79,8 @@ void print_function_galois(unsigned char a, unsigned char b)
                 printf("+");
             }
         }
-    // free the memory
-    for (int i = 0; i < 15; i++)
+        // free the memory
+        for (int i = 0; i < 15; i++)
         {
             free(vals[i]);
         }
@@ -88,11 +88,10 @@ void print_function_galois(unsigned char a, unsigned char b)
     }
 
     printf("\n");
-    //print value
+    // print value
     printf("value = %d\n", value);
     check_value(value);
-    printf("%d\n", findPlace(value));
-
+    // printf("%d\n", findPlace(value));
 }
 
 // check if the value is greater than 255 if not divide it by 100011011 in binary
@@ -109,7 +108,7 @@ void check_value(int value)
         place = findPlace(value);
     }
 
-    // printf("reminder = %d\n", value);
+    printf("reminder = %d\n", value);
     if (value == 1)
     {
         printf("Reminder is one\n");
@@ -176,7 +175,7 @@ int main()
     //         print_function_galois(i, 0x11);
     //     }
     // }
-    print_function_galois(0xff, 0xff);
+    print_function_galois(0x78, 0xb6);
     // check_value(13712);
     // printf("%d", inverseFind(6));
     // checck both print_function_galois and multiply_ints_as_polynomials
