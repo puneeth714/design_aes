@@ -76,3 +76,43 @@ end
 assign cout=keep_on;
 endmodule
 
+
+
+// module galois_inverse #(parameter WIDTH=8)(in,out);
+// input [WIDTH-1:0]in;
+// output  [WIDTH-1:0]out;
+// reg [WIDTH-1:0]tmp1;
+// wire [WIDTH-1:0]tmp2;
+// //call galois_division_mod with in1=in and in2=0 to 255 and check for 1 in out
+// //if 1 is found then that is the inverse of in send it to out
+// galois_division_mod galois1(in,tmp1,tmp2);
+// assign out=(tmp2 ==1)?tmp1:0;
+// always @(in)
+// begin:for_loop
+//     reg [WIDTH-1:0]i;
+//     $display("i %b",i);
+//     for(i=1;i<2**(WIDTH-1);i=i+1)
+//         begin
+//             //$display("i %b",i);
+//             tmp1=i;
+//             $display("tmp2 %b",tmp2);
+//             if(tmp2==1)
+//             begin
+//                 out=i;
+//             end
+//         end
+//     end
+// endmodule
+
+// module galois_inverse_tb;
+// reg [7:0]in;
+// wire [7:0]out;
+// galois_inverse galois1(in,out);
+// initial
+// begin
+//     $monitor(" %b %b",in,out);
+//     in=8'b11111111;
+//     #10;
+// end
+// endmodule
+

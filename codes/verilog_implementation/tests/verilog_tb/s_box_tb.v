@@ -93,7 +93,7 @@ endmodule
 
 
 
-module galois_division_mod_tb1;
+module galois_division_mod_tb;
 reg [7:0]in1;
 reg [7:0]in2;
 wire [7:0]out;
@@ -110,5 +110,38 @@ begin
         in2=8'b10110110;
         #10;
     end
+end
+endmodule
+
+module galois_division_mod_tb;
+reg [7:0]in1;
+reg [7:0]in2;
+wire [7:0]out;
+galois_division_mod galois_mod(in1,in2,out);
+initial
+begin
+    $monitor("in1=%b in2=%b out=%b",in1,in2,out);
+    in1=8'b00000101;
+    in2=8'b00000011;
+    #10; 
+end
+endmodule
+
+
+
+
+module findWay_tb;
+reg [7:0]in1;
+reg [7:0]in2;
+wire [7:0]out1;
+wire [7:0]out2;
+findWay find1(in1,in2,out1,out2);
+initial
+begin
+    $monitor("in1=%b in2=%b out1=%b out2=%b",in1,in2,out1,out2);
+
+    in1=8'b00000001;
+    in2=8'b00000010;
+    #10;
 end
 endmodule

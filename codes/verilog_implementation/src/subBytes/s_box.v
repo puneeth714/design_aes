@@ -150,14 +150,11 @@ assign out[1]= ((in[7]&0) ^ (in[6]&1) ^ (in[5]&0) ^ (in[4]&1) ^ (in[3]&0) ^ (in[
 assign out[0]= ((in[7]&1) ^ (in[6]&0) ^ (in[5]&1) ^ (in[4]&0) ^ (in[3]&1) ^ (in[2]&0) ^ (in[1]&1) ^ (in[0]&1)^1);
 endmodule
 
-module galois_multiplication_inverse(in,out);
-input [7:0]in;
-output [7:0]out;
-endmodule
+
 
 module galois_multiplication_modulous_ins #(parameter WIDTH=8)(in,out);
 input [2*(WIDTH-1):0]in;
-output [WIDTH-1:0]out;
+output reg [WIDTH-1:0]out;
 wire [2*(WIDTH-1):0]ins[7:0];
 wire [3:0]place_out[7:0];
 find_place place1(in,place_out[0]);
@@ -173,7 +170,16 @@ galois_division galois5(ins[3],place_out[4],ins[4]);
 find_place place6(ins[4],place_out[5]);
 galois_division galois6(ins[4],place_out[5],ins[5]);
 find_place place7(ins[5],place_out[6]);
-galois_division galois7(ins[5],place_out[6],out);
+galois_division galois7(ins[5],place_out[6],ins[6]);
+always @(ins[6])
+begin
+    #1;
+    out=ins[6];
+end
+// always @*
+// begin
+//     $display("galois_multiplication_modulous_ins in=%b out=%b ins[0]=%b ins[1]=%b ins[2]=%b ins[3]=%b ins[4]=%b ins[5]=%b ins[6]=%b ins[7]=%b",in,out,ins[0],ins[1],ins[2],ins[3],ins[4],ins[5],ins[6],ins[7]);
+// end
 endmodule
 
 
@@ -188,41 +194,114 @@ assign out=tmp2;
 endmodule
 
 
-module galois_inverse #(parameter WIDTH=8)(in,out);
+module findWay(in1,in2,out1,out2);
+input [7:0]in1;
+input [7:0]in2;
+output reg [7:0]out1;
+output reg [7:0]out2;
+//if in1 is 1 then send in2 to out2
+//else send in2 to out1
+always @(in1)
+begin
+    //$display("findway in1=%b in2=%b",in1,in2);
+    if(in1==1)
+    begin
+        out2=in2;
+    end
+    else
+    begin
+        out1=in2;
+    end
+    //$display("findway out1=%b out2=%b",out1,out2);
+end
+endmodule
+
+module increment(in,sig,out,sig_back);
+input [7:0]in;
+input sig;
+output reg  [7:0]out;
+output reg sig_back;
+//if in is dont care then send 1 to out
+//else send in+1 to out
+always @(sig)
+begin
+    //$display("increment in=%b sig=%b",in,sig);
+   if (sig==1)
+    begin
+        out=8'b0000001;
+        sig_back=1;
+    end
+end
+always @(in)
+begin
+    //if in=11111111 then dont increment
+    if(in==8'b11111111)
+    begin
+        out=in;
+    end
+    else
+    begin
+        out=in+1;
+    end
+end
+    //$display("increment out=%b sig_back=%b",out,sig_back);
+
+
+//assign out=(sig==1)?1:in+1;
+endmodule
+
+module galois_multiplication_inverse #(parameter WIDTH=8)(in,out);
+//find inverse of in and send it to out
 input [WIDTH-1:0]in;
 output  [WIDTH-1:0]out;
-reg [WIDTH-1:0]tmp1;
-wire [WIDTH-1:0]tmp2;
-//call galois_division_mod with in1=in and in2=0 to 255 and check for 1 in out
-//if 1 is found then that is the inverse of in send it to out
-galois_division_mod galois1(in,tmp1,tmp2);
-assign out=(tmp2 ==1)?tmp1:0;
+wire [WIDTH-1:0]in2;
+wire [WIDTH-1:0]out1;
+wire [WIDTH-1:0]out2;
+reg sig;
+wire sig_back;
+//increment out1,in2
+increment increment1(out2,sig,in2,sig_back);
+galois_division_mod galois1(in,in2,out1);
+//findWay in1,in2,out1,out2,sig;
+findWay find1(out1,in2,out2,out);
+// always @*
+// begin
+//     $display("galois_multiplication_inverse in=%b in2=%b out1=%b out2=%b sig=%b",in,in2,out1,out2,sig);
+// end
 always @(in)
-begin:for_loop
-    reg [WIDTH-1:0]i;
-    $display("i %b",i);
-    for(i=1;i<2**(WIDTH-1);i=i+1)
-        begin
-            //$display("i %b",i);
-            tmp1=i;
-            $display("tmp2 %b",tmp2);
-            if(tmp2==1)
-            begin
-                out=i;
-            end
-        end
-    end
+begin
+    // we have to drive the increment1 module
+    sig=1;
+end
+always @(sig_back)
+begin
+    sig=0;
+end
 endmodule
 
 module galois_inverse_tb;
 reg [7:0]in;
 wire [7:0]out;
-galois_inverse galois1(in,out);
+galois_multiplication_inverse galois1(in,out);
 initial
 begin
-    $monitor(" %b %b",in,out);
-    in=8'b11111111;
-    #10;
+    //monitor all the signals internally also
+    $monitor("in=%x out=%x",in,out);
+    in=8'b10110110;
 end
 endmodule
 
+
+// module galois_division_mod_tb;
+// reg [7:0]in1;
+// reg [7:0]in2;
+// wire [7:0]out;
+// galois_division_mod galois_mod(in1,in2,out);
+// initial
+// begin
+//     $monitor("in1=%b in2=%b out=%b",in1,in2,out);
+//     in1=8'b10110110;
+//     in2=8'b00000110;
+//     #10; 
+// end
+// endmodule
