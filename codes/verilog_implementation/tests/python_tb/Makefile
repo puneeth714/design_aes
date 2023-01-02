@@ -8,11 +8,11 @@ VERILOG_SOURCES += $(PWD)/../../src/subBytes/s_box.v
 
 WAVES ?= 1
 # TOPLEVEL is the name of the toplevel module in your Verilog or VHDL file
-TOPLEVEL = galois_multiplication
+TOPLEVEL = galois_inverse_2
 # MODULE is the basename of the Python test file
 
 # PWD=$(shell pwd)/src
-MODULE = subBytes_s_box_galoise_multipication
+MODULE = subBytes_s_box_galoise_inverse
 
 # COMPILE_ARGS+=-Pshift_register.WIDTH=8
 # include cocotb's make rules to take care of the simulator setup

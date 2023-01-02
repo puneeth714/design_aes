@@ -138,6 +138,7 @@ int inverseFind(int value)
     printf("q0 = %d\n q1 = %d\n q2 = %d\n q3 = %d\n", q0, q1, q2, q3);
     return (q0 | (q1 << 1) | (q2 << 2) | (q3 << 3));
 }
+
 int findPlace(int value)
 {
     int place = 0;
@@ -175,7 +176,7 @@ int main()
     //         print_function_galois(i, 0x11);
     //     }
     // }
-    print_function_galois(0x05,0x03);
+    print_function_galois(0x78, 0xb6);
     // check_value(13712);
     // printf("%d", inverseFind(6));
     // checck both print_function_galois and multiply_ints_as_polynomials

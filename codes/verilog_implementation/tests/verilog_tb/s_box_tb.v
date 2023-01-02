@@ -145,3 +145,52 @@ begin
     #10;
 end
 endmodule
+
+module galois_inverse_working_tb;
+reg [7:0]in;
+wire [7:0]out;
+galois_inverse_2 galois1(in,out);
+initial
+begin
+    $monitor("%x inverse is %x",in,out);
+    repeat(100)
+    begin
+        in=8'b01111000;
+        #1;
+    end
+end
+endmodule
+
+// module galois_inverse_working_tb;
+// reg [7:0]in;
+// wire [7:0]out;
+module sbox_implementation_tb;
+reg [7:0]inp;
+reg side;
+wire [7:0]out;
+reg [7:0]in;
+
+sbox_implementation s1(inp,side,out);
+initial begin
+    //monitor internal signals also
+    $monitor("inp %x side %b out %x",inp,side,out);
+    for(inp=0;inp<255;inp=inp+1)
+    begin
+        side=0;
+        #10;
+        in=inp;
+        inp=out;
+        side=1;
+        #10;
+        inp=in;
+        if(inp==out)
+        begin
+            $display("sbox_implementation_tb in=%x out=%x",in,out);
+        end
+        else
+        begin
+            $display("not valid in=%x out=%x",in,out);
+        end
+    end
+end
+endmodule

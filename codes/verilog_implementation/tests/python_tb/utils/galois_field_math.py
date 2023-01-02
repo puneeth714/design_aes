@@ -57,3 +57,44 @@ def bin_to_dec(binary: str):
 #print(bin_to_dec(input("Enter a binary number: ")))
 # for i in range(15):
 #     print(f"{i} : {get_combination(7, i)}")
+
+def multiply_ints_as_polynomials(x, y):
+    z = 0
+    while x != 0:
+        if x & 1 == 1:
+            z ^= y
+        y <<= 1
+        x >>= 1
+    return z
+
+
+def number_bits(x):
+    nb = 0
+    while x != 0:
+        nb += 1
+        x >>= 1
+    return nb
+
+
+def mod_int_as_polynomial(x, m):
+    nbm = number_bits(m)
+    while True:
+        nbx = number_bits(x)
+        if nbx < nbm:
+            return x
+        mshift = m << (nbx - nbm)
+        x ^= mshift
+
+
+def rijndael_multiplication(x, y):
+    z = multiply_ints_as_polynomials(x, y)
+    m = 0x11b
+    return mod_int_as_polynomial(z, m)
+
+
+def rijndael_inverse(x):
+    if x == 0:
+        return 0
+    for y in range(1, 256):
+        if rijndael_multiplication(x, y) == 1:
+            return y

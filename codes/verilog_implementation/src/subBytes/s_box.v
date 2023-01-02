@@ -84,6 +84,10 @@ begin
 end
 endmodule
 
+//Name: galois_division
+//Inputs: cin,place
+//Outputs: cout
+//Description: This module is used to divide the cin by 283 a irreducible polynomial
 module galois_division #(parameter WIDTH = 8) (cin,place,cout);
 input  [2*(WIDTH-1):0] cin;
 input [3:0]place;
@@ -101,6 +105,32 @@ output [2*(WIDTH-1):0] cout;
 assign cout = (place>8)?(cin ^ (283 <<(place-9))):cin;
 endmodule
 
+
+//Name: galois_division_2
+//Inputs: cin
+//Outputs: cout
+//Description: This module is used to divide the cin by 283 a irreducible polynomial and return the cout
+//Here we are using continous assignment
+module galois_division_2 #(parameter WIDTH = 8) (cin,cout);
+input  [2*(WIDTH-1):0] cin;
+output cout;
+wire d0,d1,d2,d3,d4,d5,d6,d7;
+assign d7=cin[7] ^ cin[11] ^ cin[12] ^ cin[14];
+assign d6=cin[6] ^ cin[10] ^ cin[11] ^ cin[13];
+assign d5=cin[5] ^ cin[9] ^ cin[10] ^ cin[12];
+assign d4=cin[4] ^ cin[8] ^ cin[9] ^ cin[11] ^ cin[14];
+assign d3=cin[3] ^ cin[8] ^ cin[10] ^ cin[11] ^ cin[12] ^ cin[13] ^ cin[14];
+assign d2=cin[2] ^ cin[9] ^ cin[10] ^ cin[13];
+assign d1=cin[1] ^ cin[8] ^ cin[9] ^ cin[12] ^ cin[14];
+assign d0=cin[0] ^ cin[8] ^ cin[12] ^ cin[13];
+assign cout = (~(d7 | d6 | d5 | d4 | d3 | d2 | d1 ) & d0);    
+endmodule
+
+
+//Name: find_place
+//Inputs: cin
+//Outputs: place_out
+//Description: This module is used to find the place of the first 1 in the cin
 module find_place #(parameter WIDTH = 8) (cin,place_out);
 input  [2*(WIDTH-1):0] cin;
 output reg [3:0]place_out;
@@ -120,6 +150,12 @@ begin:find_place
 end
 endmodule
 
+
+//Name: affine_transform
+//Inputs: in
+//Outputs: out
+//Description: This module is used to do the affine transform on the input 
+//affine transform is done by xor with 01100011 and circular shift left by 1 bit of 11111000
 module affine_transform(in,out);
 input [7:0]in;
 output [7:0]out;
@@ -135,23 +171,33 @@ assign out[1]= ((in[7]&1) ^ (in[6]&1) ^ (in[5]&1) ^ (in[4]&0) ^ (in[3]&0) ^ (in[
 assign out[0]= ((in[7]&1) ^ (in[6]&1) ^ (in[5]&1) ^ (in[4]&1) ^ (in[3]&0) ^ (in[2]&0) ^ (in[1]&0) ^ (in[0]&1)^1);
 endmodule
 
+
+//Name: affine_inverse_transform
+//Inputs: in
+//Outputs: out
+//Description: This module is used to do the affine inverse transform on the input
+//affine inverse transform is done by xor with 00000101 and circular shift right by 1 bit of 01010010
 module affine_inverse_transform(in,out);
 input [7:0]in;
 output [7:0]out;
 //whole xor with 00000101 each bit
 // //circuilar shift  01010010
 assign out[7]= ((in[7]&0) ^ (in[6]&1) ^ (in[5]&0) ^ (in[4]&1) ^ (in[3]&0) ^ (in[2]&0) ^ (in[1]&1) ^ (in[0]&0)^0);
-assign out[6]= ((in[7]&1) ^ (in[6]&0) ^ (in[5]&1) ^ (in[4]&0) ^ (in[3]&1) ^ (in[2]&0) ^ (in[1]&0) ^ (in[0]&1)^0);
-assign out[5]= ((in[7]&0) ^ (in[6]&1) ^ (in[5]&0) ^ (in[4]&1) ^ (in[3]&0) ^ (in[2]&1) ^ (in[1]&0) ^ (in[0]&0)^0);
-assign out[4]= ((in[7]&1) ^ (in[6]&0) ^ (in[5]&1) ^ (in[4]&0) ^ (in[3]&1) ^ (in[2]&0) ^ (in[1]&1) ^ (in[0]&0)^0);
-assign out[3]= ((in[7]&0) ^ (in[6]&1) ^ (in[5]&0) ^ (in[4]&1) ^ (in[3]&0) ^ (in[2]&1) ^ (in[1]&0) ^ (in[0]&1)^0);
-assign out[2]= ((in[7]&1) ^ (in[6]&0) ^ (in[5]&1) ^ (in[4]&0) ^ (in[3]&1) ^ (in[2]&0) ^ (in[1]&1) ^ (in[0]&1)^1);
-assign out[1]= ((in[7]&0) ^ (in[6]&1) ^ (in[5]&0) ^ (in[4]&1) ^ (in[3]&0) ^ (in[2]&1) ^ (in[1]&0) ^ (in[0]&1)^0);
-assign out[0]= ((in[7]&1) ^ (in[6]&0) ^ (in[5]&1) ^ (in[4]&0) ^ (in[3]&1) ^ (in[2]&0) ^ (in[1]&1) ^ (in[0]&1)^1);
+assign out[6]= ((in[7]&0) ^ (in[6]&0) ^ (in[5]&1) ^ (in[4]&0) ^ (in[3]&1) ^ (in[2]&0) ^ (in[1]&0) ^ (in[0]&1)^0);
+assign out[5]= ((in[7]&1) ^ (in[6]&0) ^ (in[5]&0) ^ (in[4]&1) ^ (in[3]&0) ^ (in[2]&1) ^ (in[1]&0) ^ (in[0]&0)^0);
+assign out[4]= ((in[7]&0) ^ (in[6]&1) ^ (in[5]&0) ^ (in[4]&0) ^ (in[3]&1) ^ (in[2]&0) ^ (in[1]&1) ^ (in[0]&0)^0);
+assign out[3]= ((in[7]&0) ^ (in[6]&0) ^ (in[5]&1) ^ (in[4]&0) ^ (in[3]&0) ^ (in[2]&1) ^ (in[1]&0) ^ (in[0]&1)^0);
+assign out[2]= ((in[7]&1) ^ (in[6]&0) ^ (in[5]&0) ^ (in[4]&1) ^ (in[3]&0) ^ (in[2]&0) ^ (in[1]&1) ^ (in[0]&0)^1);
+assign out[1]= ((in[7]&0) ^ (in[6]&1) ^ (in[5]&0) ^ (in[4]&0) ^ (in[3]&1) ^ (in[2]&0) ^ (in[1]&0) ^ (in[0]&1)^0);
+assign out[0]= ((in[7]&1) ^ (in[6]&0) ^ (in[5]&1) ^ (in[4]&0) ^ (in[3]&0) ^ (in[2]&1) ^ (in[1]&0) ^ (in[0]&0)^1);
 endmodule
 
-
-
+//Name: galois_multiplication_modulous_ins
+//Inputs: in
+//Outputs: out
+//Description: This module is used to do the galois multiplication modulous ins on the input
+//we are using the galois division module to do the galois multiplication modulous ins 
+//and we are using the find place module to find the place of the input
 module galois_multiplication_modulous_ins #(parameter WIDTH=8)(in,out);
 input [2*(WIDTH-1):0]in;
 output reg [WIDTH-1:0]out;
@@ -183,6 +229,11 @@ end
 endmodule
 
 
+//Name: galois_division_mod
+//Inputs: in1,in2
+//Outputs: out
+//Description: This module is used to do the galois division mod on the input using the galois multiplication module
+// and the galois multiplication modulous ins module
 module galois_division_mod #(parameter WIDTH=8)(in1,in2,out);
 input [WIDTH-1:0]in1;
 input [WIDTH-1:0]in2;
@@ -245,11 +296,16 @@ begin
     end
 end
     //$display("increment out=%b sig_back=%b",out,sig_back);
-
-
 //assign out=(sig==1)?1:in+1;
 endmodule
 
+//Name: galois_multiplication_inverse
+//Inputs: in
+//Outputs: out
+//Description: This module is used to do the galois multiplication inverse on the input
+//we are using the galois division module to do the galois multiplication inverse 
+//and we are using the increment module to increment the input
+//and we are using the findWay module to find the way of the input
 module galois_multiplication_inverse #(parameter WIDTH=8)(in,out);
 //find inverse of in and send it to out
 input [WIDTH-1:0]in;
@@ -279,29 +335,74 @@ begin
 end
 endmodule
 
-module galois_inverse_tb;
-reg [7:0]in;
-wire [7:0]out;
-galois_multiplication_inverse galois1(in,out);
-initial
+
+//Name: galois_inverse_2
+//Inputs: inp
+//Outputs: out
+//Description: This module is used to do the galois inverse on the input
+//we are using the galois_multiplication module to do the galois multiplication
+//and we are using the galois_division_2 module to do the galois division
+module galois_inverse_2 #(parameter WIDTH=8) (inp,out);
+input [7:0]inp;
+output reg [7:0]out;
+wire [2*(WIDTH-1):0]tmp1[255:0];
+wire tmp2[255:0];
+//instantiate galois_multiplication with generate block
+genvar i;
+generate
+for(i=0;i<=255;i=i+1)
+begin:starts_here
+        galois_multiplication galois1(i,inp,tmp1[i]);
+        galois_division_2 galois2(tmp1[i],tmp2[i]);
+end
+endgenerate
+//check which tmp2 is 1 and send that index to out
+reg [7:0]j;
+always @*
 begin
-    //monitor all the signals internally also
-    $monitor("in=%x out=%x",in,out);
-    in=8'b10110110;
+    for(j=0;j<255;j=j+1)
+    begin
+        //#10;
+        //$display("galois_inverse_2 inp=%x tmp2[%x]=%x",inp,j,tmp2[j]);
+        if(tmp2[j]==1)
+        begin
+            out=j;
+        end
+    end
 end
 endmodule
 
 
-// module galois_division_mod_tb;
-// reg [7:0]in1;
-// reg [7:0]in2;
-// wire [7:0]out;
-// galois_division_mod galois_mod(in1,in2,out);
-// initial
-// begin
-//     $monitor("in1=%b in2=%b out=%b",in1,in2,out);
-//     in1=8'b10110110;
-//     in2=8'b00000110;
-//     #10; 
-// end
-// endmodule
+module galois_inverse_working_tb;
+reg [7:0]in;
+wire [7:0]out;
+galois_inverse_2 galois1(in,out);
+initial
+begin
+    $monitor("in=%x out=%x",in,out);
+    in=8'b00011100;
+    #100;
+end
+endmodule
+
+
+//implementation of sbox using galois_inverse_2 and affine_transform and affine_inverse_transform
+//Name: sbox_implementation
+//Inputs: inp,side
+//Outputs: out
+//Description: This module is used to implement the sbox
+//we are using the galois_inverse_2 module to do the galois inverse
+//and we are using the affine_transform module to do the affine transform
+//and we are using the affine_inverse_transform module to do the affine inverse transform
+module sbox_implementation #(parameter WIDTH=8) (inp,side,out);
+input [7:0]inp;
+input side;
+output [7:0]out;
+wire [7:0]tmp1,tmp2,tmp3,tmp4,tmp5;
+assign tmp1=inp;
+assign tmp2=(side)?tmp3:tmp1;
+affine_transform affine1(tmp1,tmp3);
+galois_inverse_2 inverse(tmp2,tmp4);
+assign out=(side)?tmp4:tmp5;
+affine_inverse_transform affine2(tmp4,tmp5);
+endmodule
